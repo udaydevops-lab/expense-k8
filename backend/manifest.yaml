@@ -1,0 +1,62 @@
+# ------------------------- ConfigMap --------------------------
+# This ConfigMap provides environment variables to the backend deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend # ConfigMap name (used in envFrom of deployment)
+  namespace: expense  
+data:
+  DB_HOST: mysql  # Hostname of the MySQL service (internal DNS in cluster)
+
+---
+
+# ------------------------- Deployment --------------------------
+# This creates a Deployment for the backend application
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: backend
+  namespace: expense  # Deployment will be created inside the 'expense' namespace
+  labels:
+    component: backend
+    project: expense
+    tier: app
+spec:
+  replicas: 2  # Number of backend pod replicas to run
+  selector:
+    matchLabels:
+      component: backend
+      tier: app
+      project: expense  # These labels must match pod template labels
+  template:
+    metadata:
+      labels:
+        component: backend
+        project: expense
+        tier: app
+    spec:
+      containers:
+        - name: backend
+          image: darauday0/expense-backend:v1  # Docker image for backend
+          envFrom:
+            - configMapRef:
+                name: backend  # Loads all key-value pairs from the backend ConfigMap
+
+---
+
+# ------------------------- Service --------------------------
+# This Service exposes the backend pods within the cluster
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend
+  namespace: expense  # Service will also be created in 'expense' namespace
+spec:
+  selector:
+    component: backend
+    project: expense
+    tier: app  # These labels match pods created by Deployment
+  ports:
+    - protocol: TCP
+      port: 8080        # Port on the service (inside the cluster)
+      targetPort: 8080  # Port on the pod/container

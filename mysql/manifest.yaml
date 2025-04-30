@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: expense
+  labels:                    # Labels on the deployment object itself
+    component: mysql
+    project: expense
+    tier: db
+spec:
+  replicas: 2                # MySQL typically isn't deployed with replicas in Deployments due to persistence issues
+  selector:
+    matchLabels:
+      component: mysql
+      project: expense
+      tier: db
+  template:                  # Pod template section
+    metadata:
+      labels:                # Must match selector above
+        component: mysql
+        project: expense
+        tier: db
+    spec:
+      containers:
+      - name: mysql
+        image: darauday0/expense-mysql:v1
+        # In a real setup, you'd include env vars like MYSQL_ROOT_PASSWORD, etc.
+        # Also persistent volumes (PVC) will be added in StatefulSet versions later
+
+
+        ### we will do it in upcoming sessions
+
+---
+# ------------------------ Service -------------------------
+# Exposes the mysql deployment to internal traffic using clusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:                  # Must match the pod labels to route traffic correctly
+    component: mysql
+    project: expense
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 3306               # Port exposed by the Service (what other pods use to talk to MySQL)
+    targetPort: 3306         # Container port exposed by the MySQL image
