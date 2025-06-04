@@ -137,4 +137,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80           # Port exposed to external clients
-      targetPort: 80     # Port that container listens on (must match internal app)
+      targetPort: 8080     # Port that container listens on (must match internal app)
