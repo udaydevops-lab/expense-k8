@@ -37,7 +37,14 @@ spec:
     spec:
       containers:
         - name: backend
-          image: darauday0/expense-backend:v1  # Docker image for backend
+          image: darauday0/expense-backend:v1 # Docker image for backend
+          resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "150m"
+            memory: "256Mi"  
           envFrom:
             - configMapRef:
                 name: backend  # Loads all key-value pairs from the backend ConfigMap

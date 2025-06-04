@@ -99,6 +99,13 @@ spec:
       containers:
         - name: frontend
           image: darauday0/expense-frontend:v1  # Docker image for frontend app
+          resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "150m"
+            memory: "256Mi"
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx/nginx.conf  # Overwrites default Nginx config file
